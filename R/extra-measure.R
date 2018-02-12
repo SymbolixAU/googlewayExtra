@@ -2,9 +2,9 @@ googleMeasureDependencies <- function() {
 	list(
 		htmltools::htmlDependency(
 			"MeasureTool",
-			"3",
+			"0.0.9",
 			system.file("lib/MeasureTool", package = "googlewayExtra"),
-			script = "lib/MeasureTool.min.js"
+			script = c("lib/MeasureTool.min.js", "lib/measure.js")
 		)
 	)
 }

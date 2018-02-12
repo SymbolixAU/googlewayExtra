@@ -1,11 +1,14 @@
 Package: googlewayExtra
 Type: Package
-Title: What the Package Does (Title Case)
+Title: Adds Extra Features and Layers to Google Maps
 Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
+Authors@R: c(
+		person("David", "Cooley", , "dcooley@symbolix.com.au", role = c("aut", "cre")),
+		person("Zhenyang Hua", role = c("ctb", "cph"), comment = "MeasureTool-GoogleMaps-V3")
+		)
+Description: 3rd-party plugins for Google Maps implemented for the Googleway R package.
 License: What license is it under?
 Encoding: UTF-8
 LazyData: true
+Imports: 
+	htmltools
