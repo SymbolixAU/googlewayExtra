@@ -16,3 +16,10 @@ add_measure <- function(map) {
 	map$dependencies <- c(map$dependencies, googleMeasureDependencies())
 	invoke_method(map, "add_measure")
 }
+
+# Clear Measure
+#
+# @export
+# clear_measure <- function(map) {
+# 	invoke_method(map, "clear_measure")
+# }
