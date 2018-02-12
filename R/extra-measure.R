@@ -13,9 +13,6 @@ googleMeasureDependencies <- function() {
 #'
 #' @export
 add_measure <- function(map) {
-
-	print("adding measure")
 	map$dependencies <- c(map$dependencies, googleMeasureDependencies())
-
 	invoke_method(map, "add_measure")
 }
