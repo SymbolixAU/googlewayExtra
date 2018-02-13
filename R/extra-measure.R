@@ -13,9 +13,15 @@ googleMeasureDependencies <- function() {
 #'
 #' @export
 add_measure <- function(map) {
-	map$dependencies <- c(map$dependencies, googleMeasureDependencies())
+
+	if(! "MeasureTool" %in% sapply(map$dependencies, function(x) x[['name']]) )
+		map$dependencies <- c(map$dependencies, googleMeasureDependencies())
+
 	invoke_method(map, "add_measure")
 }
+
+
+
 
 # Clear Measure
 #
