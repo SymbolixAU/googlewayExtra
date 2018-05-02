@@ -4,7 +4,7 @@ googleCanvasLayerDependencies <- function() {
 			"CanvasLayer",
 			"0.0.9",
 			system.file("lib/CanvasLayer", package = "googlewayExtra"),
-			script = c("lib/CanvasLayer.js", "lib/CanvasLayer.js")
+			script = c("lib/CanvasLayer.js", "lib/canvas.js")
 		)
 	)
 }
