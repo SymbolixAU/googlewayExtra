@@ -6,6 +6,30 @@ function add_canvas(map_id) {
 
 // https://github.com/brendankenny/CanvasLayer/blob/gh-pages/examples/hello_webgl.html
 
+  var vertexShaderText =
+  [
+  '//precision mediump float;',
+  'attribute vec4 worldCoord;',
+  'attribute vec2 vertPosition;',
+  'uniform mat4 mapMatrix;',
+  'void main()',
+  '{',
+  ' //gl_Position = vec4(vertPosition, 0.0, 1.0);',
+  ' gl_Position = mapMatrix * worldCoord;',
+  ' gl_PointSize = 10.;',
+  '}'
+  ].join('\n');
+
+  var fragmentShaderText =
+  [
+  	'precision mediump float;',
+  	'',
+  	'void main()',
+  	'{',
+  	' gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);',
+  	'}'
+  ].join('\n');
+
   var map = window[map_id + 'map'],
     canvasLayer,
     gl,
@@ -13,15 +37,15 @@ function add_canvas(map_id) {
     resolutionScale = window.devicePixelRatio || 1,
     mapMatrix = new Float32Array(16);
 
-  /*
   var pointProgram;
   var pointArrayBuffer;
   var POINT_COUNT = 2000;
+
   var MIN_X = 40;
   var MAX_X = 80;
   var MIN_Y = 88;
   var MAX_Y = 109;
-  */
+
 
   // initialize the canvasLayer
   var canvasLayerOptions = {
@@ -43,38 +67,62 @@ function add_canvas(map_id) {
   	console.log("webgl not supported");
   }
 
-  gl.clearColor(0.75, 085, 0.8, 1.0);
-  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+  //gl.clearColor(0.75, 085, 0.8, 1.0);
+  //gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-/*
   createShaderProgram();
   loadData();
 
+
 	function createShaderProgram() {
 	  console.log("shder program");
-	  // create vertex shader
-	  var vertexSrc = document.getElementById('pointVertexShader').text;
-	  var vertexShader = gl.createShader(gl.VERTEX_SHADER);
-	  gl.shaderSource(vertexShader, vertexSrc);
-	  gl.compileShader(vertexShader);
-	  // create fragment shader
-	  var fragmentSrc = document.getElementById('pointFragmentShader').text;
-	  var fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
-	  gl.shaderSource(fragmentShader, fragmentSrc);
-	  gl.compileShader(fragmentShader);
-	  // link shaders to create our program
-	  pointProgram = gl.createProgram();
+
+    var vertexShader = gl.createShader(gl.VERTEX_SHADER);
+    var fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
+
+    gl.shaderSource(vertexShader, vertexShaderText);
+    gl.shaderSource(fragmentShader, fragmentShaderText);
+
+    gl.compileShader(vertexShader);
+
+    if (!gl.getShaderParameter(vertexShader, gl.COMPILE_STATUS)) {
+    	console.error("ERROR compiling vertex shader : ", gl.getShaderInfoLog(vertexShader));
+    	return;
+    }
+
+    if (!gl.getShaderParameter(fragmentShader, gl.COMPILE_STATUS)) {
+    	console.error("ERROR compiling fragment shader : ", gl.getShaderInfoLog(fragmentShader));
+    	return;
+    }
+
+    gl.compileShader(fragmentShader);
+
+
+	  //// create vertex shader
+	  //var vertexSrc = document.getElementById('pointVertexShader').text;
+	  //var vertexShader = gl.createShader(gl.VERTEX_SHADER);
+	  //gl.shaderSource(vertexShader, vertexSrc);
+	  //gl.compileShader(vertexShader);
+
+	  //// create fragment shader
+	  //var fragmentSrc = document.getElementById('pointFragmentShader').text;
+	  //var fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
+	  //gl.shaderSource(fragmentShader, fragmentSrc);
+	  //gl.compileShader(fragmentShader);
+	  //// link shaders to create our program
+
+	  var pointProgram = gl.createProgram();
 	  gl.attachShader(pointProgram, vertexShader);
 	  gl.attachShader(pointProgram, fragmentShader);
 	  gl.linkProgram(pointProgram);
 	  gl.useProgram(pointProgram);
 	}
 
-
   // linear interpolate between a and b
   function lerp(a, b, t) {
     return a + t * (b - a);
   }
+
 
   function loadData() {
     // this data could be loaded from anywhere, but in this case we'll
@@ -84,16 +132,19 @@ function add_canvas(map_id) {
       rawData[i] = lerp(MIN_X, MAX_X, Math.random());
       rawData[i + 1] = lerp(MIN_Y, MAX_Y, Math.random());
     }
+
     // create webgl buffer, bind it, and load rawData into it
     pointArrayBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, pointArrayBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, rawData, gl.STATIC_DRAW);
     // enable the 'worldCoord' attribute in the shader to receive buffer
     var attributeLoc = gl.getAttribLocation(pointProgram, 'worldCoord');
-      gl.enableVertexAttribArray(attributeLoc);
-      // tell webgl how buffer is laid out (pairs of x,y coords)
-      gl.vertexAttribPointer(attributeLoc, 2, gl.FLOAT, false, 0, 0);
-*/
+    gl.enableVertexAttribArray(attributeLoc);
+    // tell webgl how buffer is laid out (pairs of x,y coords)
+    gl.vertexAttribPointer(attributeLoc, 2, gl.FLOAT, false, 0, 0);
+  }
+
+
     function resize() {
         var width = canvasLayer.canvas.width;
         var height = canvasLayer.canvas.height;
