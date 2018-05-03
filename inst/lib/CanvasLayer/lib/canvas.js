@@ -4,18 +4,24 @@ function add_canvas(map_id) {
 
 //	measure_data(map_id);
 
+// example
 // https://github.com/brendankenny/CanvasLayer/blob/gh-pages/examples/hello_webgl.html
+
+// tutorial
+// https://www.youtube.com/watch?v=kB0ZVUrI4Aw
 
   var vertexShaderText =
   [
-  '//precision mediump float;',
+  'precision mediump float;',
+  '',
   'attribute vec4 worldCoord;',
-  'attribute vec2 vertPosition;',
+  '',
   'uniform mat4 mapMatrix;',
+  '',
   'void main()',
   '{',
-  ' //gl_Position = vec4(vertPosition, 0.0, 1.0);',
   ' gl_Position = mapMatrix * worldCoord;',
+  '',
   ' gl_PointSize = 10.;',
   '}'
   ].join('\n');
@@ -52,8 +58,8 @@ function add_canvas(map_id) {
     map: map,
     resizeHandler: resize,
     animate: false,
-    updateHandler: update,
-    //resolutionScale: resolutionScale
+    //updateHandler: update,
+    resolutionScale: resolutionScale
   };
   canvasLayer = new CanvasLayer(canvasLayerOptions);
   // initialize WebGL
@@ -71,8 +77,7 @@ function add_canvas(map_id) {
   //gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
   createShaderProgram();
-  loadData();
-
+  //loadData();
 
 	function createShaderProgram() {
 	  console.log("shder program");
@@ -90,13 +95,11 @@ function add_canvas(map_id) {
     	return;
     }
 
+    gl.compileShader(fragmentShader);
     if (!gl.getShaderParameter(fragmentShader, gl.COMPILE_STATUS)) {
     	console.error("ERROR compiling fragment shader : ", gl.getShaderInfoLog(fragmentShader));
     	return;
     }
-
-    gl.compileShader(fragmentShader);
-
 
 	  //// create vertex shader
 	  //var vertexSrc = document.getElementById('pointVertexShader').text;
@@ -112,10 +115,42 @@ function add_canvas(map_id) {
 	  //// link shaders to create our program
 
 	  var pointProgram = gl.createProgram();
+
 	  gl.attachShader(pointProgram, vertexShader);
 	  gl.attachShader(pointProgram, fragmentShader);
 	  gl.linkProgram(pointProgram);
+
+	  if (!gl.getProgramParameter(pointProgram, gl.LINK_STATUS)) {
+	  	console.error('ERROR linking program', gl.getProgramInfoLog(pointProgram));
+	  }
 	  gl.useProgram(pointProgram);
+
+
+	  var rawData = new Float32Array(2 * POINT_COUNT);
+    for (var i = 0; i < rawData.length; i += 2) {
+      rawData[i] = lerp(MIN_X, MAX_X, Math.random());
+      rawData[i + 1] = lerp(MIN_Y, MAX_Y, Math.random());
+    }
+
+    // create webgl buffer, bind it, and load rawData into it
+    pointArrayBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, pointArrayBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, rawData, gl.STATIC_DRAW);
+    // enable the 'worldCoord' attribute in the shader to receive buffer
+    console.log("program? :" );
+    console.log(pointProgram);
+    var attributeLoc = gl.getAttribLocation(pointProgram, 'worldCoord');
+    // tell webgl how buffer is laid out (pairs of x,y coords)
+    gl.vertexAttribPointer(
+    	attributeLoc, // Attribute location
+    	2,            // Number of elements per attribute
+    	gl.FLOAT,     // Type of elements
+    	gl.FALSE,     //
+    	0,            // size of and individual vertex
+    	0             // offset fro mthe beginning of a single vertix to this attribute
+    	);
+    	gl.enableVertexAttribArray(attributeLoc);
+
 	}
 
   // linear interpolate between a and b
@@ -124,6 +159,7 @@ function add_canvas(map_id) {
   }
 
 
+/*
   function loadData() {
     // this data could be loaded from anywhere, but in this case we'll
     // generate some random x,y coords in a world coordinate bounding box
@@ -138,12 +174,22 @@ function add_canvas(map_id) {
     gl.bindBuffer(gl.ARRAY_BUFFER, pointArrayBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, rawData, gl.STATIC_DRAW);
     // enable the 'worldCoord' attribute in the shader to receive buffer
+    console.log("program? :" );
+    console.log(pointProgram);
     var attributeLoc = gl.getAttribLocation(pointProgram, 'worldCoord');
-    gl.enableVertexAttribArray(attributeLoc);
     // tell webgl how buffer is laid out (pairs of x,y coords)
-    gl.vertexAttribPointer(attributeLoc, 2, gl.FLOAT, false, 0, 0);
-  }
+    gl.vertexAttribPointer(
+    	attributeLoc, // Attribute location
+    	2,            // Number of elements per attribute
+    	gl.FLOAT,     // Type of elements
+    	gl.FALSE,     //
+    	0,            // size of and individual vertex
+    	0             // offset fro mthe beginning of a single vertix to this attribute
+    	);
+    	gl.enableVertexAttribArray(attributeLoc);
 
+  }
+*/
 
     function resize() {
         var width = canvasLayer.canvas.width;
@@ -180,6 +226,7 @@ function add_canvas(map_id) {
         matrix[14] += matrix[2]*tx + matrix[6]*ty;
         matrix[15] += matrix[3]*tx + matrix[7]*ty;
       }
+
       function update() {
         gl.clear(gl.COLOR_BUFFER_BIT);
         var mapProjection = map.getProjection();
