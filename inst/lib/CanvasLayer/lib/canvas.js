@@ -58,7 +58,7 @@ function add_canvas(map_id) {
     map: map,
     resizeHandler: resize,
     animate: false,
-    //updateHandler: update,
+    updateHandler: update,                // the update function called every frame
     resolutionScale: resolutionScale
   };
   canvasLayer = new CanvasLayer(canvasLayerOptions);
@@ -84,6 +84,9 @@ function add_canvas(map_id) {
 
     var vertexShader = gl.createShader(gl.VERTEX_SHADER);
     var fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
+
+    console.log("vertexShaderText");
+    console.log(vertexShaderText);
 
     gl.shaderSource(vertexShader, vertexShaderText);
     gl.shaderSource(fragmentShader, fragmentShaderText);
@@ -230,6 +233,10 @@ function add_canvas(map_id) {
       function update() {
         gl.clear(gl.COLOR_BUFFER_BIT);
         var mapProjection = map.getProjection();
+
+        console.log("map projection");
+        console.log(mapProjection);
+
         //
          // We need to create a transformation that takes world coordinate
          // points in the pointArrayBuffer to the coodinates WebGL expects.
@@ -248,6 +255,9 @@ function add_canvas(map_id) {
         var offset = mapProjection.fromLatLngToPoint(canvasLayer.getTopLeft());
         translateMatrix(mapMatrix, -offset.x, -offset.y);
         // attach matrix value to 'mapMatrix' uniform in shader
+        console.log("update pointProgram:");
+        console.log(pointProgram);
+
         var matrixLoc = gl.getUniformLocation(pointProgram, 'mapMatrix');
         gl.uniformMatrix4fv(matrixLoc, false, mapMatrix);
         // draw!
