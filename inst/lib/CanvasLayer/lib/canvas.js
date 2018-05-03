@@ -6,9 +6,14 @@ function add_canvas(map_id) {
 
 // https://github.com/brendankenny/CanvasLayer/blob/gh-pages/examples/hello_webgl.html
 
-  var map = window[map_id + 'map'];
-  var canvasLayer;
-  var gl;
+  var map = window[map_id + 'map'],
+    canvasLayer,
+    gl,
+    pixelsToWebGLMatrix = new Float32Array(16),
+    resolutionScale = window.devicePixelRatio || 1,
+    mapMatrix = new Float32Array(16);
+
+  /*
   var pointProgram;
   var pointArrayBuffer;
   var POINT_COUNT = 2000;
@@ -16,22 +21,32 @@ function add_canvas(map_id) {
   var MAX_X = 80;
   var MIN_Y = 88;
   var MAX_Y = 109;
-  var pixelsToWebGLMatrix = new Float32Array(16);
-  var mapMatrix = new Float32Array(16);
-  var resolutionScale = window.devicePixelRatio || 1;
+  */
 
   // initialize the canvasLayer
   var canvasLayerOptions = {
     map: map,
-    //resizeHandler: resize(),
+    resizeHandler: resize,
     animate: false,
-    //updateHandler: update(),
-    resolutionScale: resolutionScale
+    updateHandler: update,
+    //resolutionScale: resolutionScale
   };
   canvasLayer = new CanvasLayer(canvasLayerOptions);
   // initialize WebGL
-  gl = canvasLayer.canvas.getContext('experimental-webgl');
+  gl = canvasLayer.canvas.getContext('webgl');
+  if (!gl) {
+  	console.log("webgl not supported, falling back on experimental");
+  	gl = canvasLayer.getContext('experimental-webgl');
+  }
 
+  if (!gl) {
+  	console.log("webgl not supported");
+  }
+
+  gl.clearColor(0.75, 085, 0.8, 1.0);
+  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+/*
   createShaderProgram();
   loadData();
 
@@ -78,7 +93,7 @@ function add_canvas(map_id) {
       gl.enableVertexAttribArray(attributeLoc);
       // tell webgl how buffer is laid out (pairs of x,y coords)
       gl.vertexAttribPointer(attributeLoc, 2, gl.FLOAT, false, 0, 0);
-
+*/
     function resize() {
         var width = canvasLayer.canvas.width;
         var height = canvasLayer.canvas.height;
@@ -87,6 +102,7 @@ function add_canvas(map_id) {
         // If canvasLayer is scaled (with resolutionScale), we need to scale
         // this matrix by the same amount to account for the larger number of
         // pixels.
+
         pixelsToWebGLMatrix.set([
           2 * resolutionScale / width, 0, 0, 0,
           0, -2 * resolutionScale / height, 0, 0,
@@ -94,6 +110,7 @@ function add_canvas(map_id) {
           -1, 1, 0, 1
         ]);
       }
+
       function scaleMatrix(matrix, scaleX, scaleY) {
         // scaling x and y, which is just scaling first two columns of matrix
         matrix[0] *= scaleX;
@@ -112,18 +129,17 @@ function add_canvas(map_id) {
         matrix[14] += matrix[2]*tx + matrix[6]*ty;
         matrix[15] += matrix[3]*tx + matrix[7]*ty;
       }
-
       function update() {
         gl.clear(gl.COLOR_BUFFER_BIT);
         var mapProjection = map.getProjection();
-        /**
-         * We need to create a transformation that takes world coordinate
-         * points in the pointArrayBuffer to the coodinates WebGL expects.
-         * 1. Start with second half in pixelsToWebGLMatrix, which takes pixel
-         *     coordinates to WebGL coordinates.
-         * 2. Scale and translate to take world coordinates to pixel coords
-         * see https://developers.google.com/maps/documentation/javascript/maptypes#MapCoordinate
-         */
+        //
+         // We need to create a transformation that takes world coordinate
+         // points in the pointArrayBuffer to the coodinates WebGL expects.
+         // 1. Start with second half in pixelsToWebGLMatrix, which takes pixel
+         //     coordinates to WebGL coordinates.
+          //2. Scale and translate to take world coordinates to pixel coords
+         //see https://developers.google.com/maps/documentation/javascript/maptypes#MapCoordinate
+
 
         // copy pixel->webgl matrix
         mapMatrix.set(pixelsToWebGLMatrix);
@@ -139,8 +155,10 @@ function add_canvas(map_id) {
         // draw!
         gl.drawArrays(gl.POINTS, 0, POINT_COUNT);
       }
+      /*
 
       document.addEventListener('DOMContentLoaded', init, false);
   }
+  */
 }
 
