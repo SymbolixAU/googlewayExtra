@@ -1,8 +1,9 @@
 # library(googleway)
 # set_key(read.dcf("~/Documents/.googleAPI", fields = "GOOGLE_MAP_KEY"))
 #
+# devtools::install_github("SymbolixAU/googlewayExtra", ref = "three")
 # set.seed(123)
-# n <- 1e3
+# n <- 1e5
 # lons <- sample(-180:180, n, replace = T)
 # lats <- sample(-90:90, n, replace = T)
 #
@@ -12,4 +13,4 @@
 # 	styles = map_styles()$dark,
 # 	location = c(0,0),
 # 	zoom = 2) %>%
-# 	add_three()
+# 	add_three(data = df)
